@@ -32,7 +32,7 @@ The platform implements role-based access control with three user roles:
 The application follows the **MVC (Model-View-Controller)** architectural pattern:
 
 ```
-movieLand/
+movie-land-platform/
 ├── config/
 │   └── db.js                 # MongoDB connection & index creation
 ├── controllers/
@@ -73,7 +73,11 @@ movieLand/
 │   ├── admin.html           # Admin panel
 │   ├── login.html           # Login page
 │   └── register.html        # Registration page
-└── index.js                 # Application entry point
+├── .env                     # Environment variables 
+├── index.js                 # Application entry point
+├── package.json             # Project dependencies & scripts
+├── package-lock.json        # Locked dependency versions
+└── README.md                # Project documentation
 ```
 
 **Data Flow:**
@@ -283,7 +287,7 @@ Authorization: Bearer {token}
 
 **Total Endpoints: 14**
 
-## 🔧 MongoDB Implementation
+## MongoDB Implementation
 
 ### CRUD Operations
 
@@ -442,8 +446,8 @@ When a user is deleted, the system performs manual cascading:
 
 1. **Clone the repository**
 ```bash
-git clone <repository-url>
-cd movieLandCopy1
+git clone https://github.com/yerkebulan111/movie-land-platform.git
+cd movie-land-platform
 ```
 
 2. **Install dependencies**
