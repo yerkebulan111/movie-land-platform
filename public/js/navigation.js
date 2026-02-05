@@ -1,4 +1,4 @@
-// Update active navigation based on current page
+
 document.addEventListener('DOMContentLoaded', () => {
     const currentPath = window.location.pathname;
     const navLinks = document.querySelectorAll('.nav-menu a');
@@ -6,15 +6,16 @@ document.addEventListener('DOMContentLoaded', () => {
     navLinks.forEach(link => {
         const href = link.getAttribute('href');
         
-        // Remove active class from all links
+        
         link.classList.remove('active');
         
-        // Add active class to matching link
-        if (href === currentPath || 
-            (href === '/' && currentPath === '/index.html') ||
-            (currentPath === '/' && href === '/')) {
-            link.classList.add('active');
-        } else if (href !== '/' && currentPath.includes(href)) {
+        
+        if (currentPath === '/' || currentPath === '/index.html') {
+        
+            if (href === '/' || href === '/index.html') {
+                link.classList.add('active');
+            }
+        } else if (href !== '/' && href !== '/index.html' && currentPath.includes(href.replace('/', ''))) {
             link.classList.add('active');
         }
     });

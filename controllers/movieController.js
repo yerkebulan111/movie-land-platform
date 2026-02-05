@@ -1,88 +1,100 @@
 const Movie = require('../models/Movie');
+const Review = require('../models/Review');
 const { validationResult } = require('express-validator');
 
-// @desc    Get all movies with filtering, sorting, and pagination
-// @route   GET /api/movies
-// @access  Public
+
+// GET /api/movies
+
 exports.getMovies = async (req, res, next) => {
     try {
-        const { 
-            genre, 
-            year, 
-            director, 
-            minRating, 
-            sortBy = 'createdAt', 
+        const {
+            genre,
+            year,
+            director,
+            minRating,
+            sortBy = 'createdAt',
             order = 'desc',
             page = 1,
             limit = 10
         } = req.query;
+
         
-        // Build query
         const query = {};
-        
+
         if (genre) {
             query.genre = genre;
         }
-        
+
         if (year) {
             query.year = parseInt(year);
         }
-        
+
         if (director) {
             query.director = new RegExp(director, 'i');
         }
-        
+
         if (minRating) {
             query.ranking = { $gte: parseFloat(minRating) };
         }
-        
+
         // Pagination
         const skip = (parseInt(page) - 1) * parseInt(limit);
         const sortOrder = order === 'asc' ? 1 : -1;
-        
+
         const movies = await Movie.find(query)
+            .populate({
+                path: 'reviews',
+                select: 'rating comment username user createdAt'
+            })
             .sort({ [sortBy]: sortOrder })
             .limit(parseInt(limit))
-            .skip(skip)
-            .select('-reviews');
+            .skip(skip);
+
         
+        const moviesWithCount = movies.map(movie => {
+            const movieObj = movie.toObject();
+            const reviewCount = movieObj.reviews ? movieObj.reviews.length : 0;
+            delete movieObj.reviews;
+            return { ...movieObj, reviewCount };
+        });
+
         const total = await Movie.countDocuments(query);
-        
+
         res.status(200).json({
             success: true,
-            count: movies.length,
+            count: moviesWithCount.length,
             total,
             page: parseInt(page),
             pages: Math.ceil(total / parseInt(limit)),
-            data: movies
+            data: moviesWithCount
         });
     } catch (error) {
         next(error);
     }
 };
 
-// @desc    Search movies by text
+
 // @route   GET /api/movies/search
-// @access  Public
+
 exports.searchMovies = async (req, res, next) => {
     try {
         const { q } = req.query;
-        
+
         if (!q) {
             return res.status(400).json({
                 success: false,
                 message: 'Please provide a search query'
             });
         }
-        
+
         const movies = await Movie.find(
             { $text: { $search: q } },
             { score: { $meta: 'textScore' } }
         )
-        .sort({ score: { $meta: 'textScore' } })
-        .limit(20)
-        .select('-reviews');
-        
+            .sort({ score: { $meta: 'textScore' } })
+            .limit(20)
+            .select('-reviews');
+
         res.status(200).json({
             success: true,
             count: movies.length,
@@ -93,9 +105,10 @@ exports.searchMovies = async (req, res, next) => {
     }
 };
 
-// @desc    Get movie statistics (aggregation pipeline)
-// @route   GET /api/movies/stats
-// @access  Public
+
+
+// GET /api/movies/stats
+
 exports.getMovieStats = async (req, res, next) => {
     try {
         const stats = await Movie.aggregate([
@@ -149,7 +162,7 @@ exports.getMovieStats = async (req, res, next) => {
                 }
             }
         ]);
-        
+
         res.status(200).json({
             success: true,
             data: stats[0]
@@ -159,13 +172,14 @@ exports.getMovieStats = async (req, res, next) => {
     }
 };
 
-// @desc    Get top rated movies
+
+
 // @route   GET /api/movies/top-rated
-// @access  Public
+
 exports.getTopRatedMovies = async (req, res, next) => {
     try {
         const { limit = 10 } = req.query;
-        
+
         const movies = await Movie.aggregate([
             {
                 $match: {
@@ -195,7 +209,7 @@ exports.getTopRatedMovies = async (req, res, next) => {
                 }
             }
         ]);
-        
+
         res.status(200).json({
             success: true,
             count: movies.length,
@@ -206,9 +220,9 @@ exports.getTopRatedMovies = async (req, res, next) => {
     }
 };
 
-// @desc    Get single movie by ID
-// @route   GET /api/movies/:id
-// @access  Public
+
+// GET /api/movies/:id
+
 exports.getMovieById = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -217,17 +231,21 @@ exports.getMovieById = async (req, res, next) => {
             errors: errors.array()
         });
     }
-    
+
     try {
-        const movie = await Movie.findById(req.params.id);
-        
+        const movie = await Movie.findById(req.params.id)
+            .populate({
+                path: 'reviews',
+                select: 'rating comment username user createdAt'
+            });
+
         if (!movie) {
             return res.status(404).json({
                 success: false,
                 message: 'Movie not found'
             });
         }
-        
+
         res.status(200).json({
             success: true,
             data: movie
@@ -237,9 +255,10 @@ exports.getMovieById = async (req, res, next) => {
     }
 };
 
-// @desc    Create a new movie
-// @route   POST /api/movies
-// @access  Private (Admin)
+
+
+// POST /api/movies
+
 exports.createMovie = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -248,12 +267,12 @@ exports.createMovie = async (req, res, next) => {
             errors: errors.array()
         });
     }
-    
+
     try {
         req.body.createdBy = req.user.id;
-        
+
         const movie = await Movie.create(req.body);
-        
+
         res.status(201).json({
             success: true,
             data: movie
@@ -263,9 +282,9 @@ exports.createMovie = async (req, res, next) => {
     }
 };
 
-// @desc    Update a movie
-// @route   PUT /api/movies/:id
-// @access  Private (Admin)
+
+// PUT /api/movies/:id
+
 exports.updateMovie = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -274,20 +293,20 @@ exports.updateMovie = async (req, res, next) => {
             errors: errors.array()
         });
     }
-    
+
     try {
         let movie = await Movie.findById(req.params.id);
-        
+
         if (!movie) {
             return res.status(404).json({
                 success: false,
                 message: 'Movie not found'
             });
         }
+
         
-        // Don't allow updating reviews through this endpoint
         delete req.body.reviews;
-        
+
         movie = await Movie.findByIdAndUpdate(
             req.params.id,
             { $set: req.body },
@@ -296,7 +315,7 @@ exports.updateMovie = async (req, res, next) => {
                 runValidators: true
             }
         );
-        
+
         res.status(200).json({
             success: true,
             data: movie
@@ -306,9 +325,9 @@ exports.updateMovie = async (req, res, next) => {
     }
 };
 
-// @desc    Delete a movie
-// @route   DELETE /api/movies/:id
-// @access  Private (Admin)
+
+// DELETE /api/movies/:id
+
 exports.deleteMovie = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -317,19 +336,19 @@ exports.deleteMovie = async (req, res, next) => {
             errors: errors.array()
         });
     }
-    
+
     try {
         const movie = await Movie.findById(req.params.id);
-        
+
         if (!movie) {
             return res.status(404).json({
                 success: false,
                 message: 'Movie not found'
             });
         }
-        
+
         await Movie.findByIdAndDelete(req.params.id);
-        
+
         res.status(200).json({
             success: true,
             message: 'Movie deleted successfully'
@@ -339,9 +358,9 @@ exports.deleteMovie = async (req, res, next) => {
     }
 };
 
-// @desc    Add a review to a movie
-// @route   POST /api/movies/:id/reviews
-// @access  Private
+
+// POST /api/movies/:id/reviews
+
 exports.addReview = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -350,37 +369,44 @@ exports.addReview = async (req, res, next) => {
             errors: errors.array()
         });
     }
-    
+
     try {
         const movie = await Movie.findById(req.params.id);
-        
+
         if (!movie) {
             return res.status(404).json({
                 success: false,
                 message: 'Movie not found'
             });
         }
+
         
-        // Check if user has already reviewed
-        if (movie.hasUserReviewed(req.user.id)) {
+        const existingReview = await Review.findOne({
+            movie: req.params.id,
+            user: req.user.id
+        });
+
+        if (existingReview) {
             return res.status(400).json({
                 success: false,
                 message: 'You have already reviewed this movie'
             });
         }
-        
-        const review = {
+
+        const review = await Review.create({
             user: req.user.id,
+            movie: req.params.id,
             username: req.user.username,
             rating: req.body.rating,
             comment: req.body.comment
-        };
+        });
+
+        movie.reviews.push(review._id);
+
         
-        movie.reviews.push(review);
-        movie.updateRanking();
-        
+        await movie.updateRanking();
         await movie.save();
-        
+
         res.status(201).json({
             success: true,
             data: movie
@@ -390,9 +416,10 @@ exports.addReview = async (req, res, next) => {
     }
 };
 
-// @desc    Update a review
+
+
 // @route   PUT /api/movies/:id/reviews/:reviewId
-// @access  Private
+
 exports.updateReview = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -401,41 +428,43 @@ exports.updateReview = async (req, res, next) => {
             errors: errors.array()
         });
     }
-    
+
     try {
         const movie = await Movie.findById(req.params.id);
-        
+
         if (!movie) {
             return res.status(404).json({
                 success: false,
                 message: 'Movie not found'
             });
         }
-        
-        const review = movie.reviews.id(req.params.reviewId);
-        
+
+        let review = await Review.findById(req.params.reviewId);
+
         if (!review) {
             return res.status(404).json({
                 success: false,
                 message: 'Review not found'
             });
         }
+
         
-        // Check if user owns the review
         if (review.user.toString() !== req.user.id) {
             return res.status(403).json({
                 success: false,
                 message: 'Not authorized to update this review'
             });
         }
+
         
-        // Update review fields using $set operator
         if (req.body.rating) review.rating = req.body.rating;
         if (req.body.comment) review.comment = req.body.comment;
-        
-        movie.updateRanking();
+
+        await review.save();
+
+        await movie.updateRanking();
         await movie.save();
-        
+
         res.status(200).json({
             success: true,
             data: movie
@@ -445,9 +474,9 @@ exports.updateReview = async (req, res, next) => {
     }
 };
 
-// @desc    Delete a review
-// @route   DELETE /api/movies/:id/reviews/:reviewId
-// @access  Private
+
+
+// DELETE /api/movies/:id/reviews/:reviewId
 exports.deleteReview = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -456,40 +485,42 @@ exports.deleteReview = async (req, res, next) => {
             errors: errors.array()
         });
     }
-    
+
     try {
         const movie = await Movie.findById(req.params.id);
-        
+
         if (!movie) {
             return res.status(404).json({
                 success: false,
                 message: 'Movie not found'
             });
         }
-        
-        const review = movie.reviews.id(req.params.reviewId);
-        
+
+        const review = await Review.findById(req.params.reviewId);
+
         if (!review) {
             return res.status(404).json({
                 success: false,
                 message: 'Review not found'
             });
         }
+
         
-        // Check if user owns the review or is admin
         if (review.user.toString() !== req.user.id && req.user.role !== 'admin') {
             return res.status(403).json({
                 success: false,
                 message: 'Not authorized to delete this review'
             });
         }
+
         
-        // Use $pull operator to remove review
+        await Review.findByIdAndDelete(req.params.reviewId);
+    
         movie.reviews.pull(req.params.reviewId);
-        movie.updateRanking();
-        
+
+        await movie.updateRanking();
         await movie.save();
-        
+
         res.status(200).json({
             success: true,
             message: 'Review deleted successfully',

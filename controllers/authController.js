@@ -1,9 +1,7 @@
 const User = require('../models/User');
 const { validationResult } = require('express-validator');
 
-// @desc    Register user
-// @route   POST /api/auth/register
-// @access  Public
+
 exports.register = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -16,7 +14,7 @@ exports.register = async (req, res, next) => {
     try {
         const { username, email, password } = req.body;
         
-        // Create user
+        
         const user = await User.create({
             username,
             email,
@@ -29,9 +27,8 @@ exports.register = async (req, res, next) => {
     }
 };
 
-// @desc    Login user
-// @route   POST /api/auth/login
-// @access  Public
+
+
 exports.login = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -44,7 +41,7 @@ exports.login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
         
-        // Find user by email and include password field
+        
         const user = await User.findOne({ email }).select('+password');
         
         if (!user) {
@@ -54,7 +51,7 @@ exports.login = async (req, res, next) => {
             });
         }
         
-        // Check if password matches
+        
         const isMatch = await user.matchPassword(password);
         
         if (!isMatch) {
@@ -70,9 +67,7 @@ exports.login = async (req, res, next) => {
     }
 };
 
-// @desc    Get current logged in user
-// @route   GET /api/auth/me
-// @access  Private
+
 exports.getMe = async (req, res, next) => {
     try {
         const user = await User.findById(req.user.id);
@@ -86,7 +81,69 @@ exports.getMe = async (req, res, next) => {
     }
 };
 
-// Helper function to get token from model, create cookie and send response
+
+
+exports.getWatchlist = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user.id).populate('watchlist');
+        
+        res.status(200).json({
+            success: true,
+            count: user.watchlist.length,
+            data: user.watchlist
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+
+exports.addToWatchlist = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user.id);
+        
+        
+        if (user.watchlist.includes(req.params.movieId)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Movie already in watchlist'
+            });
+        }
+        
+        user.watchlist.push(req.params.movieId);
+        await user.save();
+        
+        res.status(200).json({
+            success: true,
+            message: 'Movie added to watchlist'
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+exports.removeFromWatchlist = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user.id);
+        
+        user.watchlist = user.watchlist.filter(
+            id => id.toString() !== req.params.movieId
+        );
+        
+        await user.save();
+        
+        res.status(200).json({
+            success: true,
+            message: 'Movie removed from watchlist'
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
 const sendTokenResponse = (user, statusCode, res) => {
     const token = user.getSignedJwtToken();
     

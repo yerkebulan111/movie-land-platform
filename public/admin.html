@@ -1,24 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - MovieLand</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
     <nav class="navbar">
         <div class="container">
             <div class="nav-brand">
-                <h1>🎬 MovieLand</h1>
+                <h1>MovieLand</h1>
             </div>
             <ul class="nav-menu">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="movies.html">Movies</a></li>
+                <li id="watchlistNav" style="display: none;"><a href="watchlist.html">Watchlist</a></li>
                 <li><a href="statistics.html">Statistics</a></li>
                 <li id="userNav">
                     <span id="welcomeUser"></span>
-                    <a href="admin.html" class="active">Admin Panel</a>
+                    <a href="admin.html" id="adminLink" class="active">Admin Panel</a>
                     <a href="#" id="logoutBtn">Logout</a>
                 </li>
             </ul>
@@ -28,7 +31,7 @@
     <main class="container">
         <section class="section">
             <h1 class="page-title">Admin Panel</h1>
-            
+
             <div class="admin-actions">
                 <button id="showAddForm" class="btn btn-primary">Add New Movie</button>
             </div>
@@ -41,55 +44,55 @@
                             <label for="title">Title:</label>
                             <input type="text" id="title" required>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="year">Year:</label>
                             <input type="number" id="year" required min="1888">
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="director">Director:</label>
                             <input type="text" id="director" required>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="genre">Genres (Select multiple):</label>
-                            <select id="genre" multiple required>
-                                <option value="Action">Action</option>
-                                <option value="Adventure">Adventure</option>
-                                <option value="Animation">Animation</option>
-                                <option value="Comedy">Comedy</option>
-                                <option value="Crime">Crime</option>
-                                <option value="Drama">Drama</option>
-                                <option value="Fantasy">Fantasy</option>
-                                <option value="Horror">Horror</option>
-                                <option value="Romance">Romance</option>
-                                <option value="Sci-Fi">Sci-Fi</option>
-                                <option value="Thriller">Thriller</option>
-                            </select>
+
+                        <div class="form-group full-width">
+                            <label>Genres (Select multiple):</label>
+                            <div class="checkbox-group">
+                                <label><input type="checkbox" name="genre" value="Action"> Action</label>
+                                <label><input type="checkbox" name="genre" value="Adventure"> Adventure</label>
+                                <label><input type="checkbox" name="genre" value="Animation"> Animation</label>
+                                <label><input type="checkbox" name="genre" value="Comedy"> Comedy</label>
+                                <label><input type="checkbox" name="genre" value="Crime"> Crime</label>
+                                <label><input type="checkbox" name="genre" value="Drama"> Drama</label>
+                                <label><input type="checkbox" name="genre" value="Fantasy"> Fantasy</label>
+                                <label><input type="checkbox" name="genre" value="Horror"> Horror</label>
+                                <label><input type="checkbox" name="genre" value="Romance"> Romance</label>
+                                <label><input type="checkbox" name="genre" value="Sci-Fi"> Sci-Fi</label>
+                                <label><input type="checkbox" name="genre" value="Thriller"> Thriller</label>
+                            </div>
                         </div>
-                        
+
                         <div class="form-group full-width">
                             <label for="cast">Cast (comma separated):</label>
                             <input type="text" id="cast" placeholder="Actor 1, Actor 2, Actor 3">
                         </div>
-                        
+
                         <div class="form-group full-width">
                             <label for="description">Description:</label>
                             <textarea id="description" rows="4" required></textarea>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="posterUrl">Poster URL:</label>
                             <input type="url" id="posterUrl">
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="trailerUrl">Trailer URL (YouTube):</label>
                             <input type="url" id="trailerUrl">
                         </div>
                     </div>
-                    
+
                     <div id="formError" class="error-message" style="display: none;"></div>
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary">Add Movie</button>
@@ -107,55 +110,55 @@
                             <label for="editTitle">Title:</label>
                             <input type="text" id="editTitle" required>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="editYear">Year:</label>
                             <input type="number" id="editYear" required min="1888">
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="editDirector">Director:</label>
                             <input type="text" id="editDirector" required>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="editGenre">Genres (Select multiple):</label>
-                            <select id="editGenre" multiple required>
-                                <option value="Action">Action</option>
-                                <option value="Adventure">Adventure</option>
-                                <option value="Animation">Animation</option>
-                                <option value="Comedy">Comedy</option>
-                                <option value="Crime">Crime</option>
-                                <option value="Drama">Drama</option>
-                                <option value="Fantasy">Fantasy</option>
-                                <option value="Horror">Horror</option>
-                                <option value="Romance">Romance</option>
-                                <option value="Sci-Fi">Sci-Fi</option>
-                                <option value="Thriller">Thriller</option>
-                            </select>
+
+                        <div class="form-group full-width">
+                            <label>Genres (Select multiple):</label>
+                            <div class="checkbox-group" id="editGenreCheckboxes">
+                                <label><input type="checkbox" name="editGenre" value="Action"> Action</label>
+                                <label><input type="checkbox" name="editGenre" value="Adventure"> Adventure</label>
+                                <label><input type="checkbox" name="editGenre" value="Animation"> Animation</label>
+                                <label><input type="checkbox" name="editGenre" value="Comedy"> Comedy</label>
+                                <label><input type="checkbox" name="editGenre" value="Crime"> Crime</label>
+                                <label><input type="checkbox" name="editGenre" value="Drama"> Drama</label>
+                                <label><input type="checkbox" name="editGenre" value="Fantasy"> Fantasy</label>
+                                <label><input type="checkbox" name="editGenre" value="Horror"> Horror</label>
+                                <label><input type="checkbox" name="editGenre" value="Romance"> Romance</label>
+                                <label><input type="checkbox" name="editGenre" value="Sci-Fi"> Sci-Fi</label>
+                                <label><input type="checkbox" name="editGenre" value="Thriller"> Thriller</label>
+                            </div>
                         </div>
-                        
+
                         <div class="form-group full-width">
                             <label for="editCast">Cast (comma separated):</label>
                             <input type="text" id="editCast">
                         </div>
-                        
+
                         <div class="form-group full-width">
                             <label for="editDescription">Description:</label>
                             <textarea id="editDescription" rows="4" required></textarea>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="editPosterUrl">Poster URL:</label>
                             <input type="url" id="editPosterUrl">
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="editTrailerUrl">Trailer URL (YouTube):</label>
                             <input type="url" id="editTrailerUrl">
                         </div>
                     </div>
-                    
+
                     <div id="editFormError" class="error-message" style="display: none;"></div>
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary">Update Movie</button>
@@ -168,17 +171,24 @@
                 <h2>All Movies</h2>
                 <div class="loader"></div>
             </div>
+
+            <div id="usersTable" class="movies-table" style="margin-top: 3rem;">
+                <h2>All Users</h2>
+                <div class="loader"></div>
+            </div>
         </section>
     </main>
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2026 MovieLand. All rights reserved.</p>
+            <p>&copy; MovieLand Corp.</p>
         </div>
     </footer>
 
     <script src="js/auth.js"></script>
+    <script src="js/modal.js"></script>
     <script src="js/navigation.js"></script>
     <script src="js/admin.js"></script>
 </body>
+
 </html>

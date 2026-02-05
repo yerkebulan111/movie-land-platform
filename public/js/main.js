@@ -38,7 +38,7 @@ async function loadRecentMovies() {
 
 function createMovieCard(movie) {
     return `
-        <div class="movie-card" onclick="viewMovie('${movie._id}')">
+        <div class="movie-card">
             <img src="${movie.posterUrl}" alt="${movie.title}" class="movie-poster">
             <div class="movie-info">
                 <h3 class="movie-title">${movie.title}</h3>
@@ -49,6 +49,10 @@ function createMovieCard(movie) {
                 <div class="movie-genres">
                     ${movie.genre.slice(0, 2).map(g => `<span class="genre-tag">${g}</span>`).join('')}
                 </div>
+                <div class="movie-actions">
+                    <button onclick="viewMovie('${movie._id}')" class="btn btn-primary" style="flex: 1;">Show Details</button>
+                    ${isAuthenticated() ? `<button onclick="toggleWatchlist('${movie._id}', event)" class="btn btn-secondary watchlist-btn" data-movie-id="${movie._id}">+ Watchlist</button>` : ''}
+                </div>
             </div>
         </div>
     `;
@@ -56,6 +60,32 @@ function createMovieCard(movie) {
 
 function viewMovie(id) {
     window.location.href = `/movie-detail.html?id=${id}`;
+}
+
+async function toggleWatchlist(movieId, event) {
+    event.stopPropagation();
+    const button = event.target;
+    
+    try {
+        if (button.classList.contains('in-watchlist')) {
+            await apiRequest(`/auth/watchlist/${movieId}`, { method: 'DELETE' });
+            button.textContent = '+ Watchlist';
+            button.classList.remove('in-watchlist');
+            showSuccess('Removed from watchlist');
+        } else {
+            await apiRequest(`/auth/watchlist/${movieId}`, { method: 'POST' });
+            button.textContent = '✓ In Watchlist';
+            button.classList.add('in-watchlist');
+            showSuccess('Added to watchlist!');
+        }
+    } catch (error) {
+        if (error.message.includes('already in watchlist')) {
+            button.textContent = '✓ In Watchlist';
+            button.classList.add('in-watchlist');
+        } else {
+            showError(error.message);
+        }
+    }
 }
 
 function setupSearch() {

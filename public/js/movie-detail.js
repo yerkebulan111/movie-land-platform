@@ -3,7 +3,7 @@ let currentMovieId = null;
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     currentMovieId = urlParams.get('id');
-    
+
     if (currentMovieId) {
         loadMovieDetail();
     } else {
@@ -13,19 +13,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadMovieDetail() {
     const container = document.getElementById('movieDetail');
-    
+
     try {
         const data = await apiRequest(`/movies/${currentMovieId}`);
-        
+
         if (data.success) {
             displayMovieDetail(data.data);
             displayReviews(data.data.reviews);
+
             
-            // Show review form if user is logged in and hasn't reviewed yet
             if (isAuthenticated()) {
                 const user = getCurrentUser();
                 const hasReviewed = data.data.reviews.some(r => r.user === user.id);
-                
+
                 if (!hasReviewed) {
                     document.getElementById('reviewForm').style.display = 'block';
                     setupReviewForm();
@@ -39,9 +39,9 @@ async function loadMovieDetail() {
 
 function displayMovieDetail(movie) {
     const container = document.getElementById('movieDetail');
-    
+
     const trailerEmbed = movie.trailerUrl ? getYouTubeEmbedUrl(movie.trailerUrl) : null;
-    
+
     container.innerHTML = `
         <div class="movie-detail-grid">
             <div>
@@ -85,20 +85,21 @@ function displayMovieDetail(movie) {
 
 function displayReviews(reviews) {
     const container = document.getElementById('reviewsList');
-    
+
     if (reviews.length === 0) {
         container.innerHTML = '<p>No reviews yet. Be the first to review!</p>';
         return;
     }
-    
+
     const sortedReviews = [...reviews].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    
+
     container.innerHTML = sortedReviews.map(review => {
         const currentUser = getCurrentUser();
         const isOwner = currentUser && currentUser.id === review.user;
-        
+        const isAdmin = currentUser && currentUser.role === 'admin';
+
         return `
-            <div class="review-card">
+            <div class="review-card" id="review-${review._id}">
                 <div class="review-header">
                     <span class="review-user">${review.username}</span>
                     <span class="review-rating">⭐ ${review.rating}/10</span>
@@ -106,6 +107,11 @@ function displayReviews(reviews) {
                 <p class="review-comment">${review.comment}</p>
                 <p class="review-date">${new Date(review.createdAt).toLocaleDateString()}</p>
                 ${isOwner ? `
+                    <div class="review-actions">
+                        <button onclick="editReview('${review._id}', ${review.rating}, '${review.comment.replace(/'/g, "\\'")}' )" class="btn btn-secondary">Edit</button>
+                        <button onclick="deleteReview('${review._id}')" class="btn btn-danger">Delete</button>
+                    </div>
+                ` : isAdmin ? `
                     <div class="review-actions">
                         <button onclick="deleteReview('${review._id}')" class="btn btn-danger">Delete</button>
                     </div>
@@ -117,20 +123,20 @@ function displayReviews(reviews) {
 
 function setupReviewForm() {
     const form = document.getElementById('addReviewForm');
-    
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const rating = document.getElementById('reviewRating').value;
         const comment = document.getElementById('reviewComment').value;
-        
+
         try {
             await apiRequest(`/movies/${currentMovieId}/reviews`, {
                 method: 'POST',
                 body: JSON.stringify({ rating: parseInt(rating), comment })
             });
+
             
-            // Reload the page to show new review
             window.location.reload();
         } catch (error) {
             alert('Error adding review: ' + error.message);
@@ -139,30 +145,80 @@ function setupReviewForm() {
 }
 
 async function deleteReview(reviewId) {
-    if (!confirm('Are you sure you want to delete this review?')) {
-        return;
-    }
-    
-    try {
-        await apiRequest(`/movies/${currentMovieId}/reviews/${reviewId}`, {
-            method: 'DELETE'
-        });
-        
-        // Reload the page
-        window.location.reload();
-    } catch (error) {
-        alert('Error deleting review: ' + error.message);
-    }
+    showConfirm(
+        'Are you sure you want to delete your review?',
+        async () => {
+            try {
+                await apiRequest(`/movies/${currentMovieId}/reviews/${reviewId}`, {
+                    method: 'DELETE'
+                });
+
+                showSuccess('Review deleted successfully!');
+                setTimeout(() => window.location.reload(), 1000);
+            } catch (error) {
+                showError('Error deleting review: ' + error.message);
+            }
+        },
+        'Delete',
+        'Cancel'
+    );
+}
+
+async function editReview(reviewId, currentRating, currentComment) {
+    const modal = document.createElement('div');
+    modal.className = 'modal show';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 600px;">
+            <h2>Edit Review</h2>
+            <form id="editReviewForm" style="text-align: left;">
+                <div class="form-group">
+                    <label>Rating (1-10):</label>
+                    <input type="number" id="editRating" min="1" max="10" value="${currentRating}" required>
+                </div>
+                <div class="form-group">
+                    <label>Your Review:</label>
+                    <textarea id="editComment" rows="4" required>${currentComment}</textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Review</button>
+                </div>
+            </form>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    document.getElementById('editReviewForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const rating = parseInt(document.getElementById('editRating').value);
+        const comment = document.getElementById('editComment').value;
+
+        try {
+            await apiRequest(`/movies/${currentMovieId}/reviews/${reviewId}`, {
+                method: 'PUT',
+                body: JSON.stringify({ rating, comment })
+            });
+
+            closeModal();
+            showSuccess('Review updated successfully!');
+            setTimeout(() => window.location.reload(), 1000);
+        } catch (error) {
+            closeModal();
+            showError('Error updating review: ' + error.message);
+        }
+    });
 }
 
 function getYouTubeEmbedUrl(url) {
-    // Extract video ID from various YouTube URL formats
+
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = url.match(regExp);
-    
+
     if (match && match[2].length === 11) {
         return `https://www.youtube.com/embed/${match[2]}`;
     }
-    
+
     return null;
 }

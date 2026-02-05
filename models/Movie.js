@@ -1,32 +1,5 @@
 const mongoose = require('mongoose');
 
-const reviewSchema = new mongoose.Schema({
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    username: {
-        type: String,
-        required: true
-    },
-    rating: {
-        type: Number,
-        required: true,
-        min: 1,
-        max: 10
-    },
-    comment: {
-        type: String,
-        required: true,
-        maxlength: 1000
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
-});
-
 const movieSchema = new mongoose.Schema({
     title: {
         type: String,
@@ -69,7 +42,10 @@ const movieSchema = new mongoose.Schema({
             'Romance', 'Sci-Fi', 'Sport', 'Thriller', 'War', 'Western'
         ]
     }],
-    reviews: [reviewSchema],
+    reviews: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Review'
+    }],
     posterUrl: {
         type: String,
         default: 'https://via.placeholder.com/300x450?text=No+Poster'
@@ -86,19 +62,23 @@ const movieSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Update ranking based on reviews
-movieSchema.methods.updateRanking = function() {
-    if (this.reviews.length === 0) {
+
+
+movieSchema.methods.updateRanking = async function () {
+    
+    const mongoose = require('mongoose');
+    const Review = mongoose.model('Review');
+
+    const reviews = await Review.find({ movie: this._id });
+
+    if (reviews.length === 0) {
         this.ranking = 0;
     } else {
-        const sum = this.reviews.reduce((acc, review) => acc + review.rating, 0);
-        this.ranking = (sum / this.reviews.length).toFixed(1);
+        const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
+        this.ranking = (sum / reviews.length).toFixed(1);
     }
-};
 
-// Check if user has already reviewed
-movieSchema.methods.hasUserReviewed = function(userId) {
-    return this.reviews.some(review => review.user.toString() === userId.toString());
+    return this.ranking;
 };
 
 module.exports = mongoose.model('Movie', movieSchema);

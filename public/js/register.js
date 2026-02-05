@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Redirect if already logged in
+    
     if (isAuthenticated()) {
         window.location.href = '/';
         return;
@@ -16,11 +16,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const confirmPassword = document.getElementById('confirmPassword').value;
         const errorDiv = document.getElementById('errorMessage');
         
-        // Clear and hide previous errors
+        
         errorDiv.textContent = '';
         errorDiv.style.display = 'none';
         
-        // Validate passwords match
+        
         if (password !== confirmPassword) {
             errorDiv.textContent = 'Passwords do not match';
             errorDiv.style.display = 'block';
@@ -47,11 +47,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(data.message || 'Registration failed');
             }
             
-            // Save auth data
+            
             saveAuthData(data.token, data.user);
             
-            // Redirect to home page
-            window.location.href = '/';
+            
+            showSuccess('Registration successful! Welcome to MovieLand.', '/');
         } catch (error) {
             console.error('Registration error:', error);
             errorDiv.textContent = error.message;
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Toggle password visibility
+
 function togglePassword(fieldId) {
     const field = document.getElementById(fieldId);
     const button = field.parentElement.querySelector('.password-toggle');
