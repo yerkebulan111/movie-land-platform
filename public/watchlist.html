@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Watchlist - MovieLand</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
     <nav class="navbar">
         <div class="container">
@@ -23,6 +25,7 @@
                 </li>
                 <li id="userNav" style="display: none;">
                     <span id="welcomeUser"></span>
+                    <a href="profile.html">Profile</a>
                     <a href="admin.html" id="adminLink" style="display: none;">Admin Panel</a>
                     <a href="#" id="logoutBtn">Logout</a>
                 </li>
@@ -34,7 +37,7 @@
         <section class="section">
             <h1 class="page-title">My Watchlist</h1>
             <p style="color: var(--color-light); margin-bottom: 2rem;">Save movies you want to watch later</p>
-            
+
             <div id="watchlistContainer" class="movie-grid">
                 <div class="loader"></div>
             </div>
@@ -52,4 +55,5 @@
     <script src="js/navigation.js"></script>
     <script src="js/watchlist.js"></script>
 </body>
+
 </html>

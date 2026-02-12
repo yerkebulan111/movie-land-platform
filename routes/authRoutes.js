@@ -29,4 +29,15 @@ router.post('/watchlist/:movieId', protect, authController.addToWatchlist);
 // DELETE /api/auth/watchlist/:movieId
 router.delete('/watchlist/:movieId', protect, authController.removeFromWatchlist);
 
+// PUT /api/auth/updatedetails
+router.put('/updatedetails', protect, [
+    body('username').trim().isLength({ min: 3, max: 50 }),
+    body('email').isEmail().normalizeEmail()
+], authController.updateDetails);
+
+// PUT /api/auth/updatepassword
+router.put('/updatepassword', protect, [
+    body('newPassword').isLength({ min: 6 })
+], authController.updatePassword);
+
 module.exports = router;

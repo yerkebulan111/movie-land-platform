@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - MovieLand</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>MovieLand</h1>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="movies.html">Movies</a></li>
+                <li id="watchlistNav"><a href="watchlist.html">Watchlist</a></li>
+                <li><a href="statistics.html">Statistics</a></li>
+                <li id="userNav">
+                    <span id="welcomeUser"></span>
+                    <a href="profile.html" class="active">Profile</a>
+                    <a href="admin.html" id="adminLink" style="display: none;">Admin Panel</a>
+                    <a href="#" id="logoutBtn">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="section">
+            <h1 class="page-title">My Profile</h1>
+
+
+            <div class="profile-section">
+
+                <div class="profile-item">
+                    <div class="profile-label">Username</div>
+                    <div id="usernameDisplay" class="profile-value">Loading...</div>
+                    <div id="usernameEditForm" class="edit-form hidden">
+                        <input type="text" id="usernameInput" class="edit-input">
+                        <button class="btn btn-primary btn-sm" onclick="saveField('username')">Save</button>
+                        <button class="btn btn-secondary btn-sm" onclick="toggleEdit('username', false)">Cancel</button>
+                    </div>
+                    <div id="usernameActions" class="profile-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="toggleEdit('username', true)">
+                            <i class="fas fa-pen"></i> Edit
+                        </button>
+                    </div>
+                </div>
+
+
+                <div class="profile-item">
+                    <div class="profile-label">Email</div>
+                    <div id="emailDisplay" class="profile-value">Loading...</div>
+                    <div id="emailEditForm" class="edit-form hidden">
+                        <input type="email" id="emailInput" class="edit-input">
+                        <button class="btn btn-primary btn-sm" onclick="saveField('email')">Save</button>
+                        <button class="btn btn-secondary btn-sm" onclick="toggleEdit('email', false)">Cancel</button>
+                    </div>
+                    <div id="emailActions" class="profile-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="toggleEdit('email', true)">
+                            <i class="fas fa-pen"></i> Edit
+                        </button>
+                    </div>
+                </div>
+
+
+                <div class="profile-item">
+                    <div class="profile-label">Role</div>
+                    <div id="roleDisplay" class="profile-value">Loading...</div>
+                    <div class="profile-actions">
+
+                        <span class="role-badge" id="roleBadge">User</span>
+                    </div>
+                </div>
+
+
+                <div class="profile-item">
+                    <div class="profile-label">Password</div>
+                    <div class="profile-value">***********</div>
+                    <div class="profile-actions">
+                        <button id="changePasswordBtn" class="btn btn-secondary btn-sm">Change Password</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; MovieLand Corp.</p>
+        </div>
+    </footer>
+
+
+    <div id="passwordModal" class="custom-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Change Password</h2>
+            <form id="passwordForm">
+                <div class="form-group">
+                    <label for="currentPassword">Current Password</label>
+                    <input type="password" id="currentPassword" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">New Password</label>
+                    <input type="password" id="newPassword" class="form-control" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm New Password</label>
+                    <input type="password" id="confirmPassword" class="form-control" required minlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%">Update Password</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/modal.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/profile.js"></script>
+</body>
+
+</html>

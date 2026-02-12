@@ -545,9 +545,70 @@ db.users.updateOne(
 - Cascading delete operations  
 - Full-text search capabilities  
 
-## � License
+## Usage of project 
 
-This project is open source and available under the [MIT License](LICENSE).
+### Authentification
+![registration](screenshots/{C74FC7C6-EECC-484F-BD26-2E480E2D2F51}.png)
+![successful registration](screenshots/{5F1B1F54-DC19-4A21-AA2A-1A5C78D52057}.png)
+
+![login](screenshots/{DB2FF164-688F-4C02-A0A5-2ACD643FA7AD}.png)
+
+User can Register or Login.
+
+
+## Home Page 
+![alt text](screenshots/{FB7EFEE5-A83C-41CD-9DEF-BF7FE65FF023}.png)
+![alt text](screenshots/{CFA64C50-FA42-46D1-9830-DC78212FA796}.png)
+![alt text](screenshots/{565AEA17-F8D4-49BA-98A6-3D66E72429D4}.png)
+
+This is the main page of MovieLand. When user pass authenthification, it redirects to Home page. In this page showed top rated and recently added movies
+
+## Movies Page
+![alt text](screenshots/{1950C5EA-D43B-438F-9D71-E37A198810E6}.png)
+![alt text](screenshots/{C0F29619-B783-43F5-8F42-61A9DB6D1967}.png)
+
+In this page user can search for movies or use filteration. Movies showed as cards with user-friendly design.
+
+## Movie Details
+![alt text](screenshots/{EB11898C-3D53-4AB3-9B47-FD64D6F612E7}.png)
+![alt text](screenshots/{92CD6C2B-CC82-44DD-884C-500B01761A99}.png)
+![alt text](screenshots/{9D7EC034-CEA7-406F-8E30-C334DB731EE8}.png)
+![alt text](screenshots/{F6145D01-85DD-4633-B43E-3D0E8B622AA6}.png)
+
+In movie details page user can see information about movie, rating, watch trailer and can leave review. User can leave review only once. User always can edit or delete his/her review.
+
+
+## Watchlist Page
+![alt text](screenshots/{89B80BC6-03FE-4FE0-B29F-122251748E49}.png)
+
+User can add movies to his/her watchlist. In Watchlist page stored movies that user added to watch later. User can remove movie from his/her watchlist if wants.
+
+## Statistics Page
+![alt text](screenshots/{2893410F-C7FA-4BD9-9A56-77D87B75E975}.png)
+![alt text](screenshots/{C6C3330D-D87D-439B-BFD3-6BDEF4413698}.png)
+![alt text](screenshots/{F2134AEE-0822-4FC8-9471-3497416323A9}.png)
+
+Statistics page shows overall statistics of movies in this website.
+
+## Profile Page
+![alt text](screenshots/{DFA1DF92-B792-4425-976F-31EE8F1B704F}.png)
+![alt text](screenshots/{2F657EFC-CBCE-40CB-AF17-2D2EECDE30D2}.png)
+![alt text](screenshots/{89B74C2C-E650-4430-AAF6-8A144DF029C1}.png)
+
+In Profile page, user can see credentials such as username, email, password. Also user can see his/her role in this system. User can change this data except role.
+
+## Admin Panel
+![alt text](screenshots/{6B77DF97-139E-4B06-A270-BC900B6DD733}.png)
+![alt text](screenshots/{7CDF025F-E5CB-457B-B898-05456D5FA8D6}.png)
+![alt text](screenshots/{07F5FD74-66B8-4995-A5C2-F853DD3737B2}.png)
+
+Admin has access such as create, edit or delete movies, delete users and delete reviews.
+
+## Moderator Panel
+![alt text](screenshots/{58B4D3A9-19EC-404B-94ED-539F690EE3EF}.png)
+
+Moderator can control movies: create, edit, delete.
+
 
 
 ---

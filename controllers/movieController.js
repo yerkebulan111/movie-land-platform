@@ -74,7 +74,7 @@ exports.getMovies = async (req, res, next) => {
 };
 
 
-// @route   GET /api/movies/search
+// GET /api/movies/search
 
 exports.searchMovies = async (req, res, next) => {
     try {

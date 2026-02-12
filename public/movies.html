@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movies - MovieLand</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
     <nav class="navbar">
         <div class="container">
@@ -23,6 +25,7 @@
                 </li>
                 <li id="userNav" style="display: none;">
                     <span id="welcomeUser"></span>
+                    <a href="profile.html">Profile</a>
                     <a href="admin.html" id="adminLink" style="display: none;">Admin Panel</a>
                     <a href="#" id="logoutBtn">Logout</a>
                 </li>
@@ -33,13 +36,13 @@
     <main class="container">
         <section class="section">
             <h1 class="page-title">Browse Movies</h1>
-            
+
             <div class="search-box" style="margin-bottom: 2rem;">
                 <input type="text" id="movieSearch" placeholder="Search movies by title, director...">
                 <button id="searchBtn" class="btn btn-primary">Search</button>
                 <button id="clearSearch" class="btn btn-secondary">Clear</button>
             </div>
-            
+
             <div class="filters">
                 <div class="filter-group">
                     <label>Genre:</label>
@@ -58,7 +61,7 @@
                         <option value="Thriller">Thriller</option>
                     </select>
                 </div>
-                
+
                 <div class="filter-group">
                     <label>Min Rating:</label>
                     <select id="ratingFilter">
@@ -68,7 +71,7 @@
                         <option value="9">9+</option>
                     </select>
                 </div>
-                
+
                 <div class="filter-group">
                     <label>Sort By:</label>
                     <select id="sortFilter">
@@ -78,7 +81,7 @@
                         <option value="title">Title</option>
                     </select>
                 </div>
-                
+
                 <button id="applyFilters" class="btn btn-primary">Apply Filters</button>
             </div>
 
@@ -101,4 +104,5 @@
     <script src="js/navigation.js"></script>
     <script src="js/movies.js"></script>
 </body>
+
 </html>

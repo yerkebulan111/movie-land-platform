@@ -34,7 +34,7 @@ app.get('/api/health', (req, res) => {
 
 app.use(errorHandler);
 
-// Handle 404
+
 app.use((req, res) => {
     res.status(404).json({
         success: false,
@@ -48,12 +48,3 @@ app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
-
-
-
-
-// just signal
-
-
-
-// just signal 2
