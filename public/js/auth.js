@@ -1,4 +1,4 @@
-const API_URL = 'https://movie-land-platform.onrender.com/api/';
+const API_URL = 'https://movie-land-platform.onrender.com/api';
 
 
 function isAuthenticated() {
