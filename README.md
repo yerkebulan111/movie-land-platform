@@ -1,6 +1,7 @@
 # MovieLand - Movie Review Platform
 
 A full-stack web application built with Node.js, Express, and MongoDB that allows users to discover movies, write reviews, and manage their personal watchlist.
+Project Deployed (Render): https://movie-land-platform.onrender.com
 
 ## Table of Contents
 - [Project Overview](#project-overview)
